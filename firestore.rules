@@ -2,13 +2,12 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow any authenticated user to read the list of plants and their data.
-    // This is necessary for the main dashboard to display plant information.
+    // Allow any user (authenticated or not) to read plant data.
     match /plants/{plantId} {
-      allow read: if request.auth != null;
+      allow read: if true;
+      allow write: if request.auth != null;
 
-      // Allow any authenticated user to create new sensor data or watering events.
-      // This allows the ESP32 and the web app to write data.
+      // Allow authenticated users to write to subcollections.
       match /{allPaths=**} {
         allow write: if request.auth != null;
       }
