@@ -4,7 +4,7 @@ import type { Plant } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Thermometer, Droplets, Droplet } from "lucide-react";
+import { Thermometer, Droplets, Droplet, Wind, Cloud, Waves } from "lucide-react";
 import { PepperIcon } from "@/components/icons/pepper-icon";
 import { format } from "date-fns";
 
@@ -46,7 +46,7 @@ export function PlantDashboard({ plant }: { plant: Plant }) {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="grid gap-4 md:grid-cols-2 grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3 grid-cols-2">
         <MetricCard
           title="Temperature"
           value={plant.temperature}
@@ -58,6 +58,24 @@ export function PlantDashboard({ plant }: { plant: Plant }) {
           value={plant.soilMoisture}
           unit="%"
           icon={<Droplets className="h-4 w-4 text-muted-foreground" />}
+        />
+         <MetricCard
+          title="Relative Humidity"
+          value={plant.relativeHumidity}
+          unit="%"
+          icon={<Wind className="h-4 w-4 text-muted-foreground" />}
+        />
+        <MetricCard
+          title="Absolute Humidity"
+          value={plant.absoluteHumidity}
+          unit="g/m³"
+          icon={<Cloud className="h-4 w-4 text-muted-foreground" />}
+        />
+        <MetricCard
+          title="Dew Point"
+          value={plant.dewPoint}
+          unit="°C"
+          icon={<Waves className="h-4 w-4 text-muted-foreground" />}
         />
         <MetricCard
           title="Last Watered"

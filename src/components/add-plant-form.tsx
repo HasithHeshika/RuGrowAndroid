@@ -33,6 +33,9 @@ const formSchema = z.object({
     .max(100, "Soil moisture cannot exceed 100"),
   lastWatered: z.date(),
   lastHarvested: z.date(),
+  absoluteHumidity: z.coerce.number().min(0, "Absolute humidity must be positive"),
+  dewPoint: z.coerce.number(),
+  relativeHumidity: z.coerce.number().min(0, "Relative humidity must be positive").max(100, "Relative humidity cannot exceed 100"),
 });
 
 type AddPlantFormProps = {
@@ -49,6 +52,9 @@ export function AddPlantForm({ onFormSubmit, onCancel }: AddPlantFormProps) {
       soilMoisture: 70,
       lastWatered: new Date(),
       lastHarvested: new Date(),
+      absoluteHumidity: 10,
+      dewPoint: 12,
+      relativeHumidity: 55,
     },
   });
 
@@ -95,6 +101,45 @@ export function AddPlantForm({ onFormSubmit, onCancel }: AddPlantFormProps) {
                 <FormLabel>Soil Moisture (%)</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="relativeHumidity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Relative Humidity (%)</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="absoluteHumidity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Absolute Humidity (g/m³)</FormLabel>
+                <FormControl>
+                  <Input type="number" step="0.1" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="dewPoint"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dew Point (°C)</FormLabel>
+                <FormControl>
+                  <Input type="number" step="0.1" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
