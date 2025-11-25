@@ -288,8 +288,8 @@ void loop() {
         content.set("fields/timestamp/timestampValue", fbdo.meta.timestamp);
         
         // Create a new document in the subcollection.
-        // The document ID will be assigned automatically by Firestore.
-        if (Firebase.Firestore.createDocument(&fbdo, FIREBASE_PROJECT_ID, "", documentPath.c_str(), collectionId.c_str(), content.raw())) {
+        // The document ID will be assigned automatically by Firestore if the document ID is left empty.
+        if (Firebase.Firestore.createDocument(&fbdo, FIREBASE_PROJECT_ID, "", documentPath.c_str(), "", content.raw())) {
             Serial.print("   ✓ Firestore document created successfully at path: ");
             Serial.println(fbdo.payload().c_str());
         } else {
