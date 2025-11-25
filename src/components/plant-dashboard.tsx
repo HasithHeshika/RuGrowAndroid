@@ -71,7 +71,7 @@ export function PlantDashboard({ plant }: { plant: Plant }) {
   const lastWateredEvent = wateringEvents?.[0];
 
   const handleWaterPlant = () => {
-    if (!firestore) return;
+    if (!firestore || !plant.id) return;
     const wateringEventsCollection = collection(firestore, `plants/${plant.id}/watering_events`);
     addDocumentNonBlocking(wateringEventsCollection, {
       plantId: plant.id,
