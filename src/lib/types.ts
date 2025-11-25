@@ -12,9 +12,9 @@ export interface EnvironmentData {
   plantId: string;
   temperature: number;
   soilMoisture: number;
-  relativeHumidity?: number;
-  absoluteHumidity?: number;
-  dewPoint?: number;
+  relativeHumidity: number;
+  absoluteHumidity: number;
+  dewPoint: number;
   timestamp: Timestamp;
 }
 
