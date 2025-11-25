@@ -1,8 +1,10 @@
 export const firebaseConfig = {
-  "projectId": "studio-8834724498-f8cc4",
-  "appId": "1:639835871581:web:f2a594db0b5efa9d3b30b4",
-  "apiKey": "AIzaSyB1V0T46PDfrwHJfHxKlMPBFqV_nhn8zfc",
-  "authDomain": "studio-8834724498-f8cc4.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "639835871581"
+  apiKey: "AIzaSyDWuV47g8p2qNS0uQTNFpYTc2666NteSZI",
+  authDomain: "rugrow-iot.firebaseapp.com",
+  databaseURL: "https://rugrow-iot-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rugrow-iot",
+  storageBucket: "rugrow-iot.firebasestorage.app",
+  messagingSenderId: "507012898972",
+  appId: "1:507012898972:web:f104daf081025459f6cd59",
+  measurementId: "G-ZZEEJLG2GL"
 };
