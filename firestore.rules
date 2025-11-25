@@ -72,8 +72,8 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
       allow create: if isSignedIn();
-      allow update: if isSignedIn() && resource != null;
-      allow delete: if isSignedIn() && resource != null;
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
 
       /**
        * @description Controls access to a plant's real-time environmental data.
@@ -86,8 +86,8 @@ service cloud.firestore {
         allow get: if true;
         allow list: if true;
         allow create: if isSignedIn() && isCreatingConsistentChild(plantId);
-        allow update: if isSignedIn() && resource != null && isUpdatingChild();
-        allow delete: if isSignedIn() && resource != null;
+        allow update: if isSignedIn() && isUpdatingChild();
+        allow delete: if isSignedIn();
       }
 
       /**
@@ -101,8 +101,8 @@ service cloud.firestore {
         allow get: if true;
         allow list: if true;
         allow create: if isSignedIn() && isCreatingConsistentChild(plantId);
-        allow update: if isSignedIn() && resource != null && isUpdatingChild();
-        allow delete: if isSignedIn() && resource != null;
+        allow update: if isSignedIn() && isUpdatingChild();
+        allow delete: if isSignedIn();
       }
 
       /**
@@ -116,8 +116,8 @@ service cloud.firestore {
         allow get: if true;
         allow list: if true;
         allow create: if isSignedIn() && isCreatingConsistentChild(plantId);
-        allow update: if isSignedIn() && resource != null && isUpdatingChild();
-        allow delete: if isSignedIn() && resource != null;
+        allow update: if isSignedIn() && isUpdatingChild();
+        allow delete: if isSignedIn();
       }
     }
   }
