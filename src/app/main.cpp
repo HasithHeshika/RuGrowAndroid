@@ -19,8 +19,8 @@
 #define FIREBASE_PROJECT_ID "rugrow-iot"
 
 // --- IMPORTANT ---
-// PASTE YOUR PLANT ID FROM FIRESTORE HERE
-#define PLANT_ID "PASTE_YOUR_PLANT_ID_HERE"
+// PLANT ID from Firestore
+#define PLANT_ID "LWPon1uP6aqHoUIZUuhp"
 
 
 // GPIO Pin Definitions - CORRECTED FOR YOUR ACTUAL WIRING
