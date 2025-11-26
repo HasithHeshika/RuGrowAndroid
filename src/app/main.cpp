@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
@@ -285,6 +284,9 @@ void loop() {
         content.set("fields/relativeHumidity/doubleValue", String(humidity));
         content.set("fields/absoluteHumidity/doubleValue", String(absHumidity));
         content.set("fields/dewPoint/doubleValue", String(dewPoint));
+        if (luxValid) {
+          content.set("fields/lightLevel/doubleValue", String(lux));
+        }
         content.set("fields/timestamp/timestampValue", fbdo.meta.timestamp);
         
         // Create a new document in the subcollection.
@@ -300,5 +302,4 @@ void loop() {
     }
   }
 }
-
     
