@@ -17,10 +17,8 @@
 #define DATABASE_URL "https://studio-8834724498-f8cc4-default-rtdb.asia-southeast1.firebasedatabase.app/"
 #define FIREBASE_PROJECT_ID "studio-8834724498-f8cc4"
 
-// --- IMPORTANT ---
-// PLANT ID from Firestore
+// Plant ID
 #define PLANT_ID "LWPon1uP6aqHoUIZUuhp"
-
 
 // GPIO Pin Definitions - CORRECTED FOR YOUR ACTUAL WIRING
 #define DHT_PIN 4      // GPIO4 → DHT22 Temperature Sensor
@@ -117,7 +115,7 @@ void setup() {
   delay(1000);
   
   Serial.println("\n╔════════════════════════════════════╗");
-  Serial.println("║  RuGrow IoT - Realtime Database   ║");
+  Serial.println("║   RuGrow IoT Device                ║");
   Serial.println("╚════════════════════════════════════╝\n");
   
   Serial.println("Initializing GPIO pins...");
@@ -205,23 +203,35 @@ void setup() {
 }
 
 void loop() {
+  // Read DHT22 sensor every 2 seconds
   unsigned long currentMillis = millis();
   if (currentMillis - lastSensorRead >= sensorReadInterval) {
     lastSensorRead = currentMillis;
     
-    // Read sensors
-    float temperature = dht.readTemperature();
+    // Read DHT22
+    float temperature = dht.readTemperature();    // Celsius
     float humidity = dht.readHumidity();
-    int soilRaw = analogRead(SOIL_PIN);
-    int soilPercent = map(soilRaw, 4095, 0, 0, 100);
-    soilPercent = constrain(soilPercent, 0, 100);
-    float lux = bh1750Available ? lightMeter.readLightLevel() : -1;
     
-    // Print readings to Serial
+    // Read Soil Moisture Sensor
+    int soilRaw = analogRead(SOIL_PIN);
+    int soilPercent = map(soilRaw, 4095, 0, 0, 100); // Inverted mapping
+    soilPercent = constrain(soilPercent, 0, 100);
+    
+    // Read BH1750 Light Sensor
+    float lux = 0;
+    bool luxValid = false;
+    if (bh1750Available) {
+      lux = lightMeter.readLightLevel();
+      if (lux >= 0) {
+        luxValid = true;
+      }
+    }
+    
     Serial.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     Serial.println("    🌡️  SENSOR READINGS");
     Serial.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     
+    // DHT22 readings
     if (isnan(temperature) || isnan(humidity)) {
       Serial.println("❌ Failed to read from DHT sensor!");
       rgbLed.setPixelColor(0, rgbLed.Color(255, 0, 0));
@@ -229,19 +239,22 @@ void loop() {
     } else {
       Serial.print("  Temperature: "); Serial.print(temperature); Serial.println(" °C");
       Serial.print("  Rel Humidity: "); Serial.print(humidity); Serial.println(" %");
+
       float absoluteHumidity = calculateAbsoluteHumidity(temperature, humidity);
       Serial.print("  Abs Humidity: "); Serial.print(absoluteHumidity, 2); Serial.println(" g/m³");
+
       float dewPoint = calculateDewPoint(temperature, humidity);
       Serial.print("  Dew Point:   "); Serial.print(dewPoint); Serial.println(" °C");
     }
     
     Serial.print("  Soil Moisture: "); Serial.print(soilPercent); Serial.println(" %");
 
-    if (lux >= 0) {
+    if (bh1750Available && luxValid) {
         Serial.print("  Light Level: "); Serial.print(lux); Serial.println(" lux");
     } else {
         Serial.println("  ❌ BH1750 sensor not available");
     }
+
     Serial.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
     
     // Send data to Firebase Realtime Database
@@ -249,29 +262,53 @@ void loop() {
       if (currentMillis - lastFirebaseSend >= firebaseSendInterval) {
         lastFirebaseSend = currentMillis;
         
-        Serial.println("📤 Sending data to Realtime Database...");
+        Serial.println("📤 Sending data to Firebase...");
+
+        // Calculate derived values
+        float dewPoint = calculateDewPoint(temperature, humidity);
+        float absHumidity = calculateAbsoluteHumidity(temperature, humidity);
         
-        // Path to push new environment data
-        String path = "plants/" + String(PLANT_ID) + "/environment_data";
+        // Create path: plants/{plantId}/environment_data/{timestamp}
+        String path = "plants/";
+        path += PLANT_ID;
+        path += "/environment_data";
         
+        // Create JSON data
         FirebaseJson json;
         json.set("plantId", PLANT_ID);
         json.set("temperature", temperature);
         json.set("soilMoisture", soilPercent);
         json.set("relativeHumidity", humidity);
-        json.set("absoluteHumidity", calculateAbsoluteHumidity(temperature, humidity));
-        json.set("dewPoint", calculateDewPoint(temperature, humidity));
-        if (lux >= 0) {
+        json.set("absoluteHumidity", absHumidity);
+        json.set("dewPoint", dewPoint);
+        
+        if (luxValid) {
           json.set("lightLevel", lux);
-        }
-        json.set("timestamp/.sv", "timestamp"); // Server-side timestamp
-
-        if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json)) {
-            Serial.print("   ✓ RTDB push successful. Key: ");
-            Serial.println(fbdo.pushName());
         } else {
-            Serial.print("   ❌ RTDB push failed: ");
+          json.set("lightLevel", 0.0);
+        }
+        
+        json.set("timestamp/.sv", "timestamp"); // Firebase server timestamp
+        
+        // Push data to database (creates unique key)
+        if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json)) {
+            Serial.println("   ✓ Data sent successfully!");
+            
+            // Set LED to green on success
+            rgbLed.setPixelColor(0, rgbLed.Color(0, 255, 0));
+            rgbLed.show();
+            delay(500); // Keep green for a short duration
+            rgbLed.setPixelColor(0, rgbLed.Color(0, 0, 255)); // Return to blue
+            rgbLed.show();
+
+        } else {
+            Serial.println("   ❌ Failed to send data");
+            Serial.print("   Error: ");
             Serial.println(fbdo.errorReason());
+            
+            // Set LED to red on error
+            rgbLed.setPixelColor(0, rgbLed.Color(255, 0, 0));
+            rgbLed.show();
         }
       }
     }
