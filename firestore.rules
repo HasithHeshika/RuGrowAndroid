@@ -15,8 +15,8 @@ service cloud.firestore {
 }
 
 // Realtime Database Rules
-// WARNING: The following rules are wide open and should be secured before production.
-// They allow anyone, authenticated or not, to read and write to your entire database.
+// These rules grant public read and write access to your entire database.
+// This is suitable for this demo app but should be secured for production.
 {
   "rules": {
     ".read": "true",
